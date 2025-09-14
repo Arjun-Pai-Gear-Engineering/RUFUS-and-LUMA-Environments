@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tabletGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="2" dy="4" stdDeviation="3" flood-color="rgba(0,0,0,0.3)"/>
+    </filter>
+  </defs>
+  
+  <!-- Tablet body -->
+  <rect x="16" y="8" width="96" height="112" rx="12" ry="12" 
+        fill="url(#tabletGradient)" filter="url(#shadow)"/>
+  
+  <!-- Screen -->
+  <rect x="22" y="18" width="84" height="92" rx="6" ry="6" 
+        fill="#000" opacity="0.8"/>
+  
+  <!-- Screen content -->
+  <rect x="26" y="22" width="76" height="84" rx="4" ry="4" 
+        fill="#1a1a1a"/>
+  
+  <!-- App icons grid -->
+  <circle cx="40" cy="36" r="6" fill="#007AFF"/>
+  <circle cx="56" cy="36" r="6" fill="#34C759"/>
+  <circle cx="72" cy="36" r="6" fill="#FF3B30"/>
+  <circle cx="88" cy="36" r="6" fill="#FF9500"/>
+  
+  <circle cx="40" cy="52" r="6" fill="#AF52DE"/>
+  <circle cx="56" cy="52" r="6" fill="#FF2D92"/>
+  <circle cx="72" cy="52" r="6" fill="#5AC8FA"/>
+  <circle cx="88" cy="52" r="6" fill="#FFCC02"/>
+  
+  <circle cx="40" cy="68" r="6" fill="#30D158"/>
+  <circle cx="56" cy="68" r="6" fill="#007AFF"/>
+  <circle cx="72" cy="68" r="6" fill="#FF3B30"/>
+  <circle cx="88" cy="68" r="6" fill="#34C759"/>
+  
+  <!-- Dock -->
+  <rect x="30" y="84" width="68" height="18" rx="9" ry="9" 
+        fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+  
+  <!-- Dock icons -->
+  <circle cx="42" cy="93" r="4" fill="#007AFF"/>
+  <circle cx="56" cy="93" r="4" fill="#34C759"/>
+  <circle cx="70" cy="93" r="4" fill="#FF3B30"/>
+  <circle cx="84" cy="93" r="4" fill="#FF9500"/>
+  
+  <!-- Home button -->
+  <circle cx="64" cy="118" r="6" fill="rgba(255,255,255,0.3)" 
+          stroke="rgba(255,255,255,0.6)" stroke-width="1"/>
+  <circle cx="64" cy="118" r="3" fill="none" 
+          stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
+  
+  <!-- Side buttons -->
+  <rect x="2" y="32" width="4" height="12" rx="2" ry="2" fill="#333"/>
+  <rect x="2" y="48" width="4" height="8" rx="2" ry="2" fill="#333"/>
+  <rect x="122" y="28" width="4" height="16" rx="2" ry="2" fill="#333"/>
+  
+  <!-- Camera -->
+  <circle cx="64" cy="12" r="2" fill="#333"/>
+</svg>

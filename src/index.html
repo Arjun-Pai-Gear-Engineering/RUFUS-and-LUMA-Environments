@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RUFUS-LUMA Tablet OS</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/tablet.css">
+</head>
+<body>
+    <div id="tablet-os">
+        <!-- Status Bar -->
+        <div id="status-bar">
+            <div class="status-left">
+                <span id="time"></span>
+            </div>
+            <div class="status-center">
+                <span id="system-name">RUFUS-LUMA OS</span>
+            </div>
+            <div class="status-right">
+                <span id="battery">100%</span>
+                <span id="wifi-status">📶</span>
+            </div>
+        </div>
+
+        <!-- Home Screen -->
+        <div id="home-screen" class="screen active">
+            <div class="wallpaper"></div>
+            
+            <!-- App Grid -->
+            <div id="app-grid" class="app-grid">
+                <!-- Apps will be dynamically loaded here -->
+            </div>
+
+            <!-- Dock -->
+            <div id="dock">
+                <div class="dock-app" data-app="home">
+                    <div class="app-icon">🏠</div>
+                    <span class="app-name">Home</span>
+                </div>
+                <div class="dock-app" data-app="browser">
+                    <div class="app-icon">🌐</div>
+                    <span class="app-name">Browser</span>
+                </div>
+                <div class="dock-app" data-app="camera">
+                    <div class="app-icon">📷</div>
+                    <span class="app-name">Camera</span>
+                </div>
+                <div class="dock-app" data-app="settings">
+                    <div class="app-icon">⚙️</div>
+                    <span class="app-name">Settings</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Store Screen -->
+        <div id="app-store-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
+                <h1>App Store</h1>
+            </div>
+            <div class="app-store-content">
+                <div class="featured-apps">
+                    <h2>Featured Apps</h2>
+                    <div id="featured-apps-list" class="apps-list">
+                        <!-- Featured apps will be loaded here -->
+                    </div>
+                </div>
+                <div class="installed-apps">
+                    <h2>Installed Apps</h2>
+                    <div id="installed-apps-list" class="apps-list">
+                        <!-- Installed apps will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Screen -->
+        <div id="settings-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('home-screen')">← Back</button>
+                <h1>Settings</h1>
+            </div>
+            <div class="settings-content">
+                <div class="settings-section">
+                    <h3>Display</h3>
+                    <div class="setting-item">
+                        <label>Brightness</label>
+                        <input type="range" id="brightness" min="10" max="100" value="80">
+                    </div>
+                    <div class="setting-item">
+                        <label>Wallpaper</label>
+                        <select id="wallpaper-select">
+                            <option value="default">Default</option>
+                            <option value="nature">Nature</option>
+                            <option value="abstract">Abstract</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>System</h3>
+                    <div class="setting-item">
+                        <label>Device Name</label>
+                        <input type="text" id="device-name" value="RUFUS-LUMA Tablet">
+                    </div>
+                    <div class="setting-item">
+                        <button id="shutdown-btn" class="danger-btn">Shutdown</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="overlay">
+            <div class="loading-spinner"></div>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <script src="js/tablet-os.js"></script>
+</body>
+</html>

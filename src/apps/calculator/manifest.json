@@ -1,0 +1,9 @@
+{
+  "name": "Calculator",
+  "version": "1.0.0",
+  "description": "Simple calculator for basic math operations",
+  "icon": "🔢",
+  "main": "index.html",
+  "permissions": [],
+  "category": "utilities"
+}

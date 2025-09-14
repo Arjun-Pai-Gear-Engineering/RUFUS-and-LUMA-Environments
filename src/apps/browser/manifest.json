@@ -1,0 +1,9 @@
+{
+  "name": "Browser",
+  "version": "1.0.0",
+  "description": "Web browser powered by Chromium",
+  "icon": "🌐",
+  "main": "index.html",
+  "permissions": ["internet"],
+  "category": "productivity"
+}

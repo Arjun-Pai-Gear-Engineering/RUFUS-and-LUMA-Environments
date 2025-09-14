@@ -1,0 +1,9 @@
+{
+  "name": "Notes",
+  "version": "1.0.0",
+  "description": "Simple notes app for writing and organizing thoughts",
+  "icon": "📝",
+  "main": "index.html",
+  "permissions": ["storage"],
+  "category": "productivity"
+}
