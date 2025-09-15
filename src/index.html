@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐕 Robotic Dog Control</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .container {
+            display: grid;
+            grid-template-areas: 
+                "header header"
+                "camera controls"
+                "status info";
+            grid-template-rows: 80px 1fr 120px;
+            grid-template-columns: 2fr 1fr;
+            height: 100vh;
+            gap: 10px;
+            padding: 10px;
+        }
+
+        .header {
+            grid-area: header;
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+        }
+
+        .status-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #ff4444;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #44ff44;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .camera-section {
+            grid-area: camera;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        .camera-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .camera-feed {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 0 0 15px 15px;
+        }
+
+        #camera-stream {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 10px;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .controls-section {
+            grid-area: controls;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .control-group {
+            margin-bottom: 30px;
+        }
+
+        .control-group h3 {
+            margin-bottom: 15px;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .movement-controls {
+            display: grid;
+            grid-template-areas:
+                ". up ."
+                "left stop right"
+                ". down .";
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 2px solid transparent;
+        }
+
+        .control-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .control-btn:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.4);
+        }
+
+        .control-btn.primary {
+            background: rgba(33, 150, 243, 0.8);
+        }
+
+        .control-btn.danger {
+            background: rgba(244, 67, 54, 0.8);
+        }
+
+        .control-btn.success {
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        #btn-forward { grid-area: up; }
+        #btn-left { grid-area: left; }
+        #btn-stop { grid-area: stop; }
+        #btn-right { grid-area: right; }
+        #btn-backward { grid-area: down; }
+
+        .action-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .info-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-card h4 {
+            margin-bottom: 10px;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .info-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #4fc3f7;
+        }
+
+        .status-section {
+            grid-area: status;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .info-section {
+            grid-area: info;
+            background: rgba(0,0,0,0.4);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .voice-control {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .voice-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 87, 34, 0.8);
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-btn:hover {
+            background: rgba(255, 87, 34, 1);
+            transform: scale(1.1);
+        }
+
+        .voice-btn.listening {
+            background: rgba(76, 175, 80, 0.8);
+            animation: pulse 1s infinite;
+        }
+
+        .ai-analysis {
+            background: rgba(0,0,0,0.6);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 14px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-areas: 
+                    "header"
+                    "camera"
+                    "controls"
+                    "status";
+                grid-template-columns: 1fr;
+                grid-template-rows: 60px 2fr 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🐕 Robotic Dog</div>
+            <div class="connection-status">
+                <div class="status-dot" id="connection-dot"></div>
+                <span id="connection-text">Connecting...</span>
+            </div>
+        </div>
+
+        <div class="camera-section">
+            <div class="camera-header">
+                <h2>🎥 Camera Feed</h2>
+                <div>
+                    <button class="control-btn success" onclick="takePhoto()">📷</button>
+                    <button class="control-btn primary" onclick="toggleAnalysis()">🤖</button>
+                </div>
+            </div>
+            <div class="camera-feed">
+                <img id="camera-stream" src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjNDQ0Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iI2ZmZiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhbWVyYSBGZWVkPC90ZXh0Pjwvc3ZnPg==" alt="Camera Feed">
+                <div class="camera-overlay" id="ai-overlay" style="display: none;">
+                    <div id="ai-analysis">AI analysis will appear here...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <div class="control-group">
+                <h3>🎮 Movement</h3>
+                <div class="movement-controls">
+                    <button class="control-btn primary" id="btn-forward" onclick="sendCommand('move', {direction: 'forward'})">⬆️</button>
+                    <button class="control-btn primary" id="btn-left" onclick="sendCommand('move', {direction: 'left'})">⬅️</button>
+                    <button class="control-btn danger" id="btn-stop" onclick="sendCommand('move', {direction: 'stop'})">🛑</button>
+                    <button class="control-btn primary" id="btn-right" onclick="sendCommand('move', {direction: 'right'})">➡️</button>
+                    <button class="control-btn primary" id="btn-backward" onclick="sendCommand('move', {direction: 'backward'})">⬇️</button>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>🎯 Actions</h3>
+                <div class="action-controls">
+                    <button class="control-btn success" onclick="sendCommand('gps', {action: 'get_location'})">📍</button>
+                    <button class="control-btn success" onclick="sendCommand('ai', {action: 'analyze_scene'})">🔍</button>
+                    <button class="control-btn primary" onclick="toggleAutonomous()">🤖</button>
+                    <button class="control-btn primary" onclick="sendCommand('status')">📊</button>
+                </div>
+            </div>
+
+            <div class="voice-control">
+                <button class="voice-btn" id="voice-btn" onclick="toggleVoiceControl()">🎤</button>
+                <div style="margin-top: 10px; font-size: 14px;">Voice Control</div>
+            </div>
+        </div>
+
+        <div class="status-section">
+            <h3>📊 Robot Status</h3>
+            <div id="status-content">
+                <div>🔋 Battery: <span id="battery">--</span>%</div>
+                <div>🌡️ Temperature: <span id="temperature">--</span>°C</div>
+                <div>📶 WiFi: <span id="wifi">--</span></div>
+                <div>🎯 Mode: <span id="mode">Manual</span></div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>🗺️ Navigation</h3>
+            <div class="info-panel">
+                <div class="info-card">
+                    <h4>📍 Location</h4>
+                    <div class="info-value" id="location">Getting location...</div>
+                </div>
+                <div class="info-card">
+                    <h4>🧭 Heading</h4>
+                    <div class="info-value" id="heading">--°</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+        
+        let robotConnected = false;
+        let voiceListening = false;
+        let autonomousMode = false;
+        let aiAnalysisEnabled = false;
+
+        // WebSocket connection for robot communication
+        let ws = null;
+
+        function connectToRobot() {
+            ws = new WebSocket('ws://localhost:8765');
+            
+            ws.onopen = function() {
+                robotConnected = true;
+                updateConnectionStatus(true);
+                console.log('Connected to robot');
+            };
+            
+            ws.onmessage = function(event) {
+                try {
+                    const data = JSON.parse(event.data);
+                    handleRobotMessage(data);
+                } catch (e) {
+                    console.error('Failed to parse robot message:', e);
+                }
+            };
+            
+            ws.onclose = function() {
+                robotConnected = false;
+                updateConnectionStatus(false);
+                console.log('Disconnected from robot');
+                
+                // Attempt to reconnect after 3 seconds
+                setTimeout(connectToRobot, 3000);
+            };
+            
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+            };
+        }
+
+        function updateConnectionStatus(connected) {
+            const dot = document.getElementById('connection-dot');
+            const text = document.getElementById('connection-text');
+            
+            if (connected) {
+                dot.classList.add('connected');
+                text.textContent = 'Connected';
+            } else {
+                dot.classList.remove('connected');
+                text.textContent = 'Disconnected';
+            }
+        }
+
+        function sendCommand(command, params = {}) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                const message = JSON.stringify({ command, params });
+                ws.send(message);
+                console.log('Sent command:', command, params);
+            } else {
+                console.error('Robot not connected');
+                alert('Robot not connected!');
+            }
+        }
+
+        function handleRobotMessage(data) {
+            if (data.type === 'status_update') {
+                updateStatus(data.data);
+            } else if (data.type === 'camera_frame') {
+                updateCameraFeed(data.data);
+            } else if (data.analysis) {
+                updateAIAnalysis(data.analysis);
+            }
+        }
+
+        function updateStatus(status) {
+            if (status.battery !== undefined) {
+                document.getElementById('battery').textContent = Math.round(status.battery);
+            }
+            if (status.temperature !== undefined) {
+                document.getElementById('temperature').textContent = Math.round(status.temperature);
+            }
+            if (status.wifi_connected !== undefined) {
+                document.getElementById('wifi').textContent = status.wifi_connected ? 'Connected' : 'Disconnected';
+            }
+            if (status.autonomous_mode !== undefined) {
+                document.getElementById('mode').textContent = status.autonomous_mode ? 'Autonomous' : 'Manual';
+                autonomousMode = status.autonomous_mode;
+            }
+            if (status.gps_location) {
+                const loc = status.gps_location;
+                document.getElementById('location').textContent = 
+                    `${loc.latitude?.toFixed(4)}, ${loc.longitude?.toFixed(4)}`;
+                document.getElementById('heading').textContent = 
+                    `${Math.round(loc.heading || 0)}°`;
+            }
+        }
+
+        function updateCameraFeed(frameData) {
+            if (frameData) {
+                document.getElementById('camera-stream').src = `data:image/jpeg;base64,${frameData}`;
+            }
+        }
+
+        function updateAIAnalysis(analysis) {
+            if (aiAnalysisEnabled && analysis) {
+                const overlay = document.getElementById('ai-overlay');
+                const analysisDiv = document.getElementById('ai-analysis');
+                
+                let analysisText = analysis.summary || 'No analysis available';
+                
+                if (analysis.objects && analysis.objects.length > 0) {
+                    analysisText += `\nObjects: ${analysis.objects.map(obj => obj.label).join(', ')}`;
+                }
+                
+                if (analysis.obstacles && analysis.obstacles.length > 0) {
+                    analysisText += `\nObstacles detected: ${analysis.obstacles.length}`;
+                }
+                
+                analysisDiv.textContent = analysisText;
+                overlay.style.display = 'block';
+            }
+        }
+
+        function takePhoto() {
+            sendCommand('camera', { action: 'photo' });
+        }
+
+        function toggleAnalysis() {
+            aiAnalysisEnabled = !aiAnalysisEnabled;
+            const overlay = document.getElementById('ai-overlay');
+            
+            if (aiAnalysisEnabled) {
+                sendCommand('ai', { action: 'analyze_scene' });
+                overlay.style.display = 'block';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
+
+        function toggleAutonomous() {
+            autonomousMode = !autonomousMode;
+            sendCommand('autonomous', { enabled: autonomousMode });
+        }
+
+        function toggleVoiceControl() {
+            const voiceBtn = document.getElementById('voice-btn');
+            
+            if (!voiceListening) {
+                // Start voice listening
+                voiceListening = true;
+                voiceBtn.classList.add('listening');
+                voiceBtn.textContent = '🎙️';
+                
+                // Simulate voice command processing
+                setTimeout(() => {
+                    voiceListening = false;
+                    voiceBtn.classList.remove('listening');
+                    voiceBtn.textContent = '🎤';
+                }, 3000);
+            }
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', function(event) {
+            switch(event.key) {
+                case 'ArrowUp':
+                case 'w':
+                case 'W':
+                    sendCommand('move', {direction: 'forward'});
+                    break;
+                case 'ArrowDown':
+                case 's':
+                case 'S':
+                    sendCommand('move', {direction: 'backward'});
+                    break;
+                case 'ArrowLeft':
+                case 'a':
+                case 'A':
+                    sendCommand('move', {direction: 'left'});
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                case 'D':
+                    sendCommand('move', {direction: 'right'});
+                    break;
+                case ' ':
+                    sendCommand('move', {direction: 'stop'});
+                    event.preventDefault();
+                    break;
+                case 'p':
+                case 'P':
+                    takePhoto();
+                    break;
+            }
+        });
+
+        // Initialize camera feed refresh
+        setInterval(() => {
+            if (robotConnected) {
+                // Update camera feed URL to force refresh
+                const img = document.getElementById('camera-stream');
+                const src = 'http://localhost:5000/api/camera/feed?' + new Date().getTime();
+                img.src = src;
+            }
+        }, 1000);
+
+        // Request status updates
+        setInterval(() => {
+            if (robotConnected) {
+                sendCommand('status');
+            }
+        }, 2000);
+
+        // Connect to robot on page load
+        window.addEventListener('load', () => {
+            connectToRobot();
+        });
+    </script>
+</body>
+</html>
