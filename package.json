@@ -1,0 +1,39 @@
+{
+  "name": "rufus-luma-tablet-os",
+  "version": "1.0.0",
+  "description": "A tablet-like operating system for Raspberry Pi 4 B+",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron src/main.js --no-sandbox",
+    "build": "electron-builder",
+    "dev": "electron src/main.js --dev --no-sandbox",
+    "install-deps": "npm install",
+    "setup-pi": "bash scripts/setup-pi.sh"
+  },
+  "keywords": ["tablet", "os", "raspberry-pi", "electron"],
+  "author": "RUFUS and LUMA Team",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.0"
+  },
+  "build": {
+    "appId": "com.rufusluma.tabletos",
+    "productName": "RUFUS-LUMA Tablet OS",
+    "directories": {
+      "output": "dist"
+    },
+    "linux": {
+      "target": [
+        {
+          "target": "AppImage",
+          "arch": ["arm64"]
+        }
+      ]
+    }
+  }
+}
