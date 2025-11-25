@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEAR Innovative Intl. School - Gurukul</title>
+    
+    <!-- Google Fonts: Montserrat (Headers) & Lato (Body) for a clean, international school look -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+    <style>
+        /* --- GEAR STYLE VARIABLES --- */
+        :root {
+            --gear-blue: #003366;     /* Deep Royal Blue */
+            --gear-green: #2E8B57;    /* Nature Green */
+            --gear-gold: #D4AF37;     /* Accent Gold */
+            --text-dark: #333333;
+            --text-light: #666666;
+            --bg-light: #F4F7F6;      /* Very light grey/blue tint */
+            --white: #ffffff;
+        }
+
+        body { 
+            font-family: 'Lato', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background: var(--bg-light); 
+            color: var(--text-dark); 
+            line-height: 1.6;
+        }
+
+        h1, h2, h3 { 
+            font-family: 'Montserrat', sans-serif; 
+            color: var(--gear-blue); 
+            margin-bottom: 0.5em;
+        }
+
+        /* --- HEADER & NAV --- */
+        header { 
+            background: var(--white); 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            padding: 0.5rem 2rem; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000;
+            border-top: 5px solid var(--gear-blue);
+        }
+
+        .logo-area h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .logo-area small {
+            color: var(--gear-green);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        nav ul { list-style: none; display: flex; padding: 0; margin: 0; }
+        nav ul li { margin-left: 30px; position: relative; cursor: pointer; font-weight: 600; color: var(--text-dark); font-size: 0.9rem; }
+        nav ul li:hover { color: var(--gear-blue); }
+        
+        /* Dropdowns */
+        .dropdown-content { 
+            display: none; 
+            position: absolute; 
+            background: var(--white); 
+            min-width: 180px; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1); 
+            z-index: 1; 
+            top: 150%; 
+            left: 0; 
+            border-top: 3px solid var(--gear-green);
+            border-radius: 0 0 4px 4px;
+        }
+        .dropdown:hover .dropdown-content { display: block; top: 100%; transition: all 0.3s ease; }
+        .dropdown-content a { 
+            color: var(--text-dark); 
+            padding: 12px 16px; 
+            display: block; 
+            text-decoration: none; 
+            font-size: 0.85rem; 
+            border-bottom: 1px solid #eee;
+        }
+        .dropdown-content a:hover { background: #f9f9f9; color: var(--gear-green); }
+
+        /* --- HERO SECTION --- */
+        .hero { 
+            background: linear-gradient(135deg, var(--gear-blue), #0055a5); 
+            height: 400px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            text-align: center; 
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+        /* Simple pattern overlay effect */
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: radial-gradient(rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            opacity: 0.5;
+        }
+        .hero-content { position: relative; z-index: 2; max-width: 800px; padding: 20px; }
+        .hero h2 { color: var(--white); font-size: 3rem; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        .hero p { font-size: 1.2rem; font-weight: 300; margin-top: 0; }
+
+        /* --- CONTENT SECTIONS --- */
+        .container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+        .section { display: none; animation: fadeInUp 0.6s ease-out; }
+        .section.active { display: block; }
+        
+        /* Cards & Images */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 30px; }
+        .founder-card { 
+            background: var(--white); 
+            padding: 20px; 
+            text-align: center; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+            border-top: 4px solid var(--gear-green);
+        }
+        .placeholder-img { 
+            width: 100%; 
+            height: 200px; 
+            background: #fff; 
+            border: 1px solid #333; /* As requested: Black border */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin-bottom: 15px; 
+            color: #555;
+            font-style: italic;
+        }
+
+        /* --- FORMS --- */
+        .form-box { 
+            background: var(--white); 
+            padding: 40px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+            max-width: 600px; 
+            margin: 0 auto; 
+        }
+        label { font-weight: 700; font-size: 0.85rem; color: var(--gear-blue); display: block; margin-top: 15px; }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px; 
+            margin-top: 5px; 
+            border: 1px solid #ddd; 
+            border-radius: 4px; 
+            font-family: 'Lato', sans-serif;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--gear-blue); outline: none; }
+        
+        button { 
+            background: var(--gear-blue); 
+            color: var(--white); 
+            padding: 12px 25px; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1rem; 
+            font-weight: 700; 
+            border-radius: 4px; 
+            margin-top: 20px; 
+            transition: background 0.3s;
+            width: 100%;
+        }
+        button:hover { background: #002244; }
+
+        /* --- LOGIN --- */
+        .login-panel { max-width: 400px; margin: 60px auto; padding: 40px; background: var(--white); box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center; border-radius: 10px; border-top: 5px solid var(--gear-gold); }
+        #user-dashboard { display: none; background: var(--white); padding: 40px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-left: 5px solid var(--gear-green); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        footer {
+            background: var(--text-dark);
+            color: #aaa;
+            text-align: center;
+            padding: 20px;
+            margin-top: 60px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="logo-area">
+            <h1>GEAR Gurukul</h1>
+            <small>Innovative International School</small>
+        </div>
+        <nav>
+            <ul>
+                <li onclick="showSection('home')">Home</li>
+                <li class="dropdown">
+                    <span>About Us ▾</span>
+                    <div class="dropdown-content">
+                        <a onclick="showSection('about')">The Campus</a>
+                        <a onclick="showSection('founders')">Leadership</a>
+                    </div>
+                </li>
+                <li class="dropdown">
+                    <span>Admissions ▾</span>
+                    <div class="dropdown-content">
+                        <a onclick="showSection('enquiry')">Apply Now</a>
+                    </div>
+                </li>
+                <li onclick="showSection('login')" style="background: var(--gear-green); color: white; padding: 5px 15px; border-radius: 20px;">Portal Login</li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- 1. HOME -->
+    <div id="home" class="section active">
+        <div class="hero">
+            <div class="hero-content">
+                <h2>Nurturing Multiple Intelligences</h2>
+                <p>A sanctuary for learning where tradition meets innovation.</p>
+            </div>
+        </div>
+        <div class="container">
+            <h2 style="text-align: center;">Welcome to Gurukul</h2>
+            <p style="text-align: center; max-width: 700px; margin: auto; color: #555;">
+                Located in a serene environment, our campus is designed to foster creativity, critical thinking, and holistic growth.
+            </p>
+            <hr style="margin: 40px 0; border: 0; border-top: 1px solid #ddd;">
+            <h3>Latest Updates</h3>
+            <div style="background: white; padding: 20px; border-left: 4px solid var(--gear-gold); box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+                <strong>Admissions Open for 2025-26</strong><br>
+                <span style="font-size: 0.9rem; color: #777;">Posted on Nov 25, 2024</span>
+                <p style="margin-bottom:0;">We are now accepting enquiries for the upcoming academic year.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. ABOUT -->
+    <div id="about" class="section container">
+        <h2>The Gurukul Experience</h2>
+        <p>Our campus is not just a school; it is a learning ecosystem.</p>
+        <div class="placeholder-img" style="height: 350px;">
+            <span style="background: white; padding: 10px;">Campus Image Placeholder</span>
+        </div>
+    </div>
+
+    <!-- 3. FOUNDERS -->
+    <div id="founders" class="section container">
+        <h2>Leadership</h2>
+        <div class="card-grid">
+            <div class="founder-card">
+                <div class="placeholder-img">Founder Photo</div>
+                <h3>Chairman</h3>
+                <p style="font-size: 0.9rem; color: #666;">Visionary leader guiding the philosophy of GEAR.</p>
+            </div>
+            <div class="founder-card">
+                <div class="placeholder-img">Principal Photo</div>
+                <h3>Principal</h3>
+                <p style="font-size: 0.9rem; color: #666;">Dedicated to academic excellence and student welfare.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. ENQUIRY -->
+    <div id="enquiry" class="section container">
+        <div class="form-box">
+            <h2 style="text-align: center;">Admission Enquiry</h2>
+            <p style="text-align: center; margin-bottom: 30px; font-size: 0.9rem; color: #666;">Fill out the form below to start your journey with GEAR.</p>
+            
+            <form id="sheetForm">
+                <label>Parent/Guardian Name</label>
+                <input type="text" name="parentName" placeholder="Enter full name" required>
+                
+                <label>Grade Applying For</label>
+                <input type="text" name="grade" placeholder="e.g. Grade 5" required>
+
+                <label>Phone Number</label>
+                <input type="tel" name="phone" placeholder="+91 ..." required>
+
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="name@example.com" required>
+                
+                <button type="submit" id="submitSheetBtn">Submit Enquiry</button>
+            </form>
+            <p id="sheetStatus" style="margin-top:20px; text-align: center; font-weight:bold;"></p>
+        </div>
+    </div>
+
+    <!-- 5. LOGIN PORTAL -->
+    <div id="login" class="section container">
+        <div class="login-panel" id="login-ui">
+            <h2>Student Portal</h2>
+            <p style="margin-bottom: 30px; color: #666;">Secure access for students and parents.</p>
+            <button onclick="googleLogin()" style="background: #4285F4; display: flex; align-items: center; justify-content: center; margin: auto; border-radius: 5px; width: auto;">
+                <span style="background:white; color: #4285F4; padding: 5px; border-radius: 2px; margin-right: 12px; font-weight: bold; font-size: 1.2rem;">G</span>
+                Sign in with Google
+            </button>
+        </div>
+
+        <div id="user-dashboard" class="container">
+            <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px;">
+                <div>
+                    <h2 style="margin:0;">Welcome, <span id="dispName">User</span></h2>
+                    <small id="dispEmail" style="color: #888;">email@address.com</small>
+                </div>
+                <button onclick="appLogout()" style="background: #f44336; width: auto; padding: 8px 20px; margin: 0;">Sign Out</button>
+            </div>
+
+            <h3>Your Status</h3>
+            <div style="background: #f9f9f9; padding: 20px; border-radius: 4px;">
+                <p id="dbStatus">Loading data...</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2025 GEAR Innovative International School. All Rights Reserved.
+    </footer>
+
+    <script>
+        // --- FIREBASE CONFIGURATION ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBC1xHD61tmvjzlvZfBgljMiEe_bjcE3XA",
+            authDomain: "giis-dashboard-67735.firebaseapp.com",
+            projectId: "giis-dashboard-67735",
+            storageBucket: "giis-dashboard-67735.firebasestorage.app",
+            messagingSenderId: "837843272844",
+            appId: "1:837843272844:web:a0b2183732708c23a267a9",
+            measurementId: "G-BWECE4NZVQ"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // --- AUTHENTICATION ---
+        function googleLogin() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider)
+                .then((result) => { checkUserInDatabase(result.user); })
+                .catch((error) => { alert("Login Failed: " + error.message); });
+        }
+
+        function appLogout() {
+            auth.signOut();
+        }
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                document.getElementById('login-ui').style.display = 'none';
+                document.getElementById('user-dashboard').style.display = 'block';
+                document.getElementById('dispName').innerText = user.displayName;
+                document.getElementById('dispEmail').innerText = user.email;
+                checkUserInDatabase(user);
+            } else {
+                document.getElementById('login-ui').style.display = 'block';
+                document.getElementById('user-dashboard').style.display = 'none';
+            }
+        });
+
+        // --- DATABASE (FIRESTORE) ---
+        function checkUserInDatabase(user) {
+            const userRef = db.collection('students').doc(user.uid);
+            const statusText = document.getElementById('dbStatus');
+
+            userRef.get().then((doc) => {
+                if (doc.exists) {
+                    statusText.innerHTML = "<strong>Active Student</strong><br>Record found in database.";
+                    statusText.style.color = "var(--gear-green)";
+                } else {
+                    statusText.innerHTML = "<strong>New Applicant</strong><br>We have created a new profile for you.";
+                    statusText.style.color = "#e67e22";
+                    userRef.set({
+                        name: user.displayName,
+                        email: user.email,
+                        role: 'applicant',
+                        created: new Date()
+                    });
+                }
+            });
+        }
+
+        // --- NAVIGATION ---
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- GOOGLE SHEETS FORM ---
+        // *** PASTE YOUR WEB APP URL HERE ***
+        const SCRIPT_URL = 'PASTE_YOUR_WEB_APP_URL_HERE';
+
+        const sheetForm = document.getElementById('sheetForm');
+        sheetForm.addEventListener('submit', e => {
+            e.preventDefault();
+            if (SCRIPT_URL.includes('https://script.google.com/macros/s/AKfycbx279Zr4gMHWqYBuEPxmYddOCfXctG1CQIQNoaO4-Mq87BEjqPtV2v7MH2VzpgimDvx/exec')) {
+                alert("Configuration Missing: Please paste your Google Apps Script URL in the code.");
+                return;
+            }
+            const btn = document.getElementById('submitSheetBtn');
+            const status = document.getElementById('sheetStatus');
+            
+            btn.disabled = true;
+            btn.innerText = "Processing...";
+
+            fetch(SCRIPT_URL, { method: 'POST', body: new FormData(sheetForm)})
+            .then(response => {
+                status.innerText = "Thank you! Your enquiry has been submitted.";
+                status.style.color = "var(--gear-green)";
+                sheetForm.reset();
+                btn.innerText = "Submit Enquiry";
+                btn.disabled = false;
+            })
+            .catch(error => {
+                status.innerText = "Submission failed. Please try again.";
+                status.style.color = "red";
+                btn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
